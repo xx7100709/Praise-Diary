@@ -21,7 +21,7 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
       background-color: #FAFAFA;
-      color: #1A1A1A;
+      color: #111111;
       padding-bottom: 80px;
       display: flex;
       justify-content: center;
@@ -45,24 +45,26 @@
     }
     .header-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
     
+    /* 縮短日期選擇器寬度與內襯 */
     .date-picker-wrapper {
       position: relative;
       background: #F0F0EE;
-      padding: 6px 12px;
-      border-radius: 10px;
-      display: flex;
+      padding: 4px 8px;
+      border-radius: 8px;
+      display: inline-flex;
       align-items: center;
+      max-width: 130px;
     }
-    /* 移除多餘自訂箭頭，讓原生日期選擇器自然展現 */
     .date-picker-input {
       border: none;
       background: transparent;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: #111;
       outline: none;
       font-family: inherit;
       cursor: pointer;
+      width: 100%;
     }
 
     /* 區塊標籤 */
@@ -99,7 +101,7 @@
       fill: none;
     }
 
-    /* 心情選擇按鈕 */
+    /* 心情選擇按鈕：邊框加粗為 2px，與月曆一致 */
     .mood-grid {
       display: flex;
       flex-wrap: wrap;
@@ -108,7 +110,7 @@
     }
     .mood-btn {
       background: #FFFFFF;
-      border: 1px solid #E5E5EA;
+      border: 2px solid #E5E5EA;
       padding: 10px 16px;
       border-radius: 12px;
       font-size: 14px;
@@ -117,9 +119,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       color: #333;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
     .mood-btn * { pointer-events: none; }
     
@@ -134,7 +135,7 @@
       width: 100%;
       height: 180px;
       background: #FFFFFF;
-      border: 1px solid #E5E5EA;
+      border: 2px solid #E5E5EA;
       border-radius: 16px;
       padding: 16px;
       font-size: 15px;
@@ -143,7 +144,6 @@
       font-family: inherit;
       margin-bottom: 24px;
       user-select: text;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
       transition: border-color 0.2s ease;
     }
     textarea:focus { border-color: #111; }
@@ -181,7 +181,7 @@
       font-weight: bold;
       background: #FFFFFF;
       border-radius: 8px;
-      border: 1px solid #E5E5EA;
+      border: 2px solid #E5E5EA;
     }
 
     .week-header {
@@ -215,7 +215,7 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      border: 1px solid #EFEFEF;
+      border: 1.5px solid #EFEFEF;
       transition: all 0.15s ease;
     }
     .cal-day-cell.empty { background: transparent; border: none; cursor: default; }
@@ -231,55 +231,50 @@
       height: 12px;
     }
 
-    /* --- 全新讚美回顧卡片設計（極簡質感 Accent 色條卡片）--- */
+    /* --- 重構：手帳風格讚美回顧卡片 --- */
     .review-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
       color: #A0A0A5;
-      margin-bottom: 14px;
-      padding: 0 4px;
-      letter-spacing: 0.5px;
-    }
-
-    .review-card-modern {
-      background: #FFFFFF;
-      border-radius: 14px;
-      padding: 16px 18px 16px 20px;
       margin-bottom: 12px;
-      position: relative;
-      border: 1px solid #EEEEEE;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-      overflow: hidden;
-      transition: transform 0.15s ease;
-    }
-    .review-card-modern:active { transform: scale(0.985); }
-
-    /* 左側心情色彩指示條 */
-    .card-accent-bar {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 5px;
+      padding: 0 2px;
+      letter-spacing: 0.8px;
     }
 
-    .card-header-clean {
+    .review-card-journal {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+      border: 1.5px solid #111111;
+      box-shadow: 3px 3px 0px #111111; /* 經典手帳俐落陰影 */
+      transition: transform 0.1s ease;
+    }
+    .review-card-journal:active { 
+      transform: translate(1px, 1px);
+      box-shadow: 2px 2px 0px #111111; 
+    }
+
+    .card-top-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
-    .card-icon-wrapper {
-      display: flex;
+    /* 心情顏色膠囊 Badge (只放 Icon，不放文字) */
+    .mood-pill {
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1.5px solid #111111;
     }
 
-    .card-text-clean {
+    .card-content-journal {
       font-size: 15px;
-      font-weight: 500;
-      color: #222222;
+      font-weight: 600;
+      color: #111111;
       line-height: 1.6;
       white-space: pre-wrap;
       user-select: text;
@@ -293,7 +288,7 @@
       right: 0;
       height: 65px;
       background: #FFFFFF;
-      border-top: 1px solid #E5E5EA;
+      border-top: 2px solid #111111;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -321,7 +316,7 @@
     .custom-modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.4);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -341,7 +336,8 @@
       width: 85%;
       max-width: 320px;
       text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 2px solid #111111;
+      box-shadow: 4px 4px 0px #111111;
     }
     .custom-modal-title { font-size: 17px; font-weight: 800; margin-bottom: 12px; display: block; }
     .custom-modal-title.hidden { display: none; }
@@ -350,7 +346,7 @@
     .custom-modal-btn {
       background: #111;
       color: #FFF;
-      border: none;
+      border: 2px solid #111;
       padding: 12px;
       border-radius: 10px;
       font-size: 15px;
@@ -358,7 +354,7 @@
       cursor: pointer;
       flex: 1;
     }
-    .custom-modal-btn.cancel { background: #F0F0EE; color: #555; }
+    .custom-modal-btn.cancel { background: #F0F0EE; color: #111; }
   </style>
 </head>
 <body>
@@ -452,7 +448,6 @@
   </div>
 
   <script>
-    // 自動判斷並讀取 config.js 中的 Key
     let supabaseClient = null;
     if (typeof window.supabase !== 'undefined' && typeof SUPABASE_URL !== 'undefined' && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -507,7 +502,6 @@
       const dd = String(selectedDay).padStart(2, '0');
       document.getElementById('praiseDatePicker').value = `${yyyy}-${mm}-${dd}`;
       
-      // 讀取重整前存下來的頁面設定，預設為 'handbook'
       const savedTab = localStorage.getItem('activeTab') || 'handbook';
       switchTab(savedTab);
 
@@ -524,7 +518,6 @@
       selectedMoodText = btn.getAttribute('data-mood');
     }
 
-    // 切換分頁並記憶在 localStorage
     function switchTab(tabName) {
       localStorage.setItem('activeTab', tabName);
 
@@ -660,7 +653,7 @@
       renderCalendar();
     }
 
-    // 全新極簡現代風讚美卡片渲染
+    // 讚美回顧卡片渲染（膠囊 Badge + 質感陰影風格）
     function renderReviews() {
       document.getElementById('selectedDateLabel').innerText = `${currentMonth + 1}/${selectedDay} 讚美回顧`;
       const list = document.getElementById('reviewList');
@@ -672,7 +665,7 @@
       });
 
       if (dayEntries.length === 0) {
-        list.innerHTML = '<div style="color:#A0A0A5; font-size:14px; padding: 12px 4px;">這天還沒有寫下讚美喔～</div>';
+        list.innerHTML = '<div style="color:#A0A0A5; font-size:14px; padding: 12px 2px;">這天還沒有寫下讚美喔～</div>';
         return;
       }
 
@@ -682,16 +675,15 @@
         const iconSvg = moodIcons[moodName] || moodIcons['愉快'];
 
         const card = document.createElement('div');
-        card.className = 'review-card-modern';
+        card.className = 'review-card-journal';
 
         card.innerHTML = `
-          <div class="card-accent-bar" style="background-color: ${color};"></div>
-          <div class="card-header-clean">
-            <div class="card-icon-wrapper">
+          <div class="card-top-bar">
+            <div class="mood-pill" style="background-color: ${color};">
               ${iconSvg}
             </div>
           </div>
-          <div class="card-text-clean">${escapeHtml(item.content)}</div>
+          <div class="card-content-journal">${escapeHtml(item.content)}</div>
         `;
 
         // 長按 500ms 觸發刪除
