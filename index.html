@@ -39,7 +39,6 @@
       border-radius: 8px;
       font-size: 14px;
       font-weight: 700;
-      cursor: pointer;
     }
 
     /* 區塊標籤 */
@@ -63,6 +62,7 @@
       fill: none;
       display: inline-block;
       vertical-align: middle;
+      pointer-events: none;
     }
 
     /* 心情選擇區塊 */
@@ -85,7 +85,11 @@
       gap: 8px;
       transition: all 0.15s ease;
       color: #111;
+      position: relative;
+      z-index: 10;
+      user-select: none;
     }
+    .mood-btn * { pointer-events: none; }
     .mood-btn.active {
       background: #FFD0D0;
       border-color: #111;
@@ -117,6 +121,8 @@
       font-size: 16px;
       font-weight: 800;
       cursor: pointer;
+      position: relative;
+      z-index: 10;
     }
     .btn-submit:active { opacity: 0.85; }
 
@@ -132,7 +138,15 @@
       margin-bottom: 20px;
     }
     .cal-title { font-size: 22px; font-weight: 800; }
-    .cal-nav { font-size: 20px; cursor: pointer; padding: 5px 12px; font-weight: bold; user-select: none; }
+    .cal-nav {
+      font-size: 20px;
+      cursor: pointer;
+      padding: 5px 12px;
+      font-weight: bold;
+      user-select: none;
+      position: relative;
+      z-index: 10;
+    }
 
     .calendar-grid {
       display: grid;
@@ -153,7 +167,10 @@
       cursor: pointer;
       border: 1.5px solid transparent;
       user-select: none;
+      position: relative;
+      z-index: 10;
     }
+    .cal-day-cell * { pointer-events: none; }
     .cal-day-cell.active {
       background: #FFD0D0;
       border-color: #111;
@@ -200,7 +217,12 @@
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
+      user-select: none;
+      width: 50%;
+      height: 100%;
+      justify-content: center;
     }
+    .tab-item * { pointer-events: none; }
     .tab-item.active { color: #111111; }
     .tab-item.active .line-icon { stroke: #111111; }
     .tab-item:not(.active) .line-icon { stroke: #8E8E93; }
@@ -281,10 +303,16 @@
   </div>
 
   <script>
-    // 填入你的 Supabase 設定
+    // 請填入你的 Supabase 設定
     const SUPABASE_URL = 'https://kfhviyqgrfycmbhuotru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmaHZpeXFncmZ5Y21iaHVvdHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4NDUsImV4cCI6MjEwMzA1OTg0NX0.TCGksnMy7SCLmI8LxtwhhAnJaQ7vZhmid4M2poOxjBY';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let supabaseClient = null;
+    
+    // 初始化 Supabase 避免變數名稱衝突
+    if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
 
     let selectedMoodText = '愉快';
     let currentYear = 2026;
@@ -292,7 +320,7 @@
     let selectedDay = 24;
     let allEntries = [];
 
-    // 線條風格 Icon 對照表
+    // 線條風格 SVG Icon 對照表
     const moodIcons = {
       '愉快': `<svg class="line-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
       '平靜': `<svg class="line-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
@@ -310,7 +338,11 @@
       const dateStr = `${currentYear}/${String(currentMonth + 1).padStart(2, '0')}/${String(selectedDay).padStart(2, '0')}`;
       document.getElementById('currentTodayDate').innerText = dateStr + ' ▾';
       
-      fetchEntries();
+      if (supabaseClient) {
+        fetchEntries();
+      } else {
+        renderCalendar();
+      }
     };
 
     function selectMood(btn) {
@@ -334,7 +366,8 @@
     }
 
     async function fetchEntries() {
-      const { data, error } = await supabase
+      if (!supabaseClient) return;
+      const { data, error } = await supabaseClient
         .from('praise_diaries')
         .select('*')
         .order('created_at', { ascending: false });
@@ -352,7 +385,12 @@
         return;
       }
 
-      const { error } = await supabase
+      if (!supabaseClient) {
+        alert('請先於程式碼中設定正確的 SUPABASE_URL 與 SUPABASE_ANON_KEY！');
+        return;
+      }
+
+      const { error } = await supabaseClient
         .from('praise_diaries')
         .insert([{ content: text, mood: selectedMoodText }]);
 
