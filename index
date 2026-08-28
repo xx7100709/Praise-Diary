@@ -1,158 +1,99 @@
-import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  Alert,
-  SafeAreaView,
-} from 'react-native';
-import { createClient } from '@supabase/supabase-js';
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>讚美日記</title>
+  <!-- 載入 Supabase SDK 與 基礎樣式 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f7f9fc; color: #333; padding: 20px; max-width: 600px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { font-size: 24px; color: #333; margin-bottom: 5px; }
+    .header p { font-size: 14px; color: #8f9bb3; }
+    .card { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    textarea { width: 100%; height: 80px; border: 1px solid #e4e9f2; border-radius: 8px; padding: 10px; font-size: 16px; margin-bottom: 10px; resize: none; }
+    button { width: 100%; background-color: #598bff; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:active { opacity: 0.8; }
+    .entry-card { background: #fff; border-left: 4px solid #598bff; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .entry-date { font-size: 12px; color: #8f9bb3; margin-bottom: 5px; }
+    .entry-content { font-size: 16px; color: #222b45; line-height: 1.4; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
 
-// 請在引號內填入你的 Supabase URL 與 ANON KEY
-const SUPABASE_URL = 'https://kfhviyqgrfycmbhuotru.supabase.co/rest/v1/';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmaHZpeXFncmZ5Y21iaHVvdHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4NDUsImV4cCI6MjEwMzA1OTg0NX0.TCGksnMy7SCLmI8LxtwhhAnJaQ7vZhmid4M2poOxjBY';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <div class="header">
+    <h1>✨ 我的讚美日記 ✨</h1>
+    <p>每天肯定自己一點點，累積好心情！</p>
+  </div>
 
-interface DiaryEntry {
-  id: string;
-  content: string;
-  created_at: string;
-}
+  <div class="card">
+    <textarea id="diaryInput" placeholder="今天有哪些值得自我讚美的事呢？"></textarea>
+    <button onclick="addEntry()">新增紀錄</button>
+  </div>
 
-export default function HomeScreen() {
-  const [entries, setEntries] = useState<DiaryEntry[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [loading, setLoading] = useState(false);
+  <div id="entriesList"></div>
 
-  useEffect(() => {
-    fetchEntries();
-  }, []);
+  <script>
+    // 請替換為你的 Supabase 設定
+    const SUPABASE_URL = 'https://kfhviyqgrfycmbhuotru.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmaHZpeXFncmZ5Y21iaHVvdHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4NDUsImV4cCI6MjEwMzA1OTg0NX0.TCGksnMy7SCLmI8LxtwhhAnJaQ7vZhmid4M2poOxjBY';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const fetchEntries = async () => {
-    try {
-      setLoading(true);
+    // 頁面載入時讀取日記
+    window.onload = fetchEntries;
+
+    async function fetchEntries() {
       const { data, error } = await supabase
         .from('praise_diaries')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      if (data) setEntries(data);
-    } catch (error: any) {
-      console.log('Error fetching:', error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (error) {
+        console.error('讀取失敗:', error);
+        return;
+      }
 
-  const saveEntry = async () => {
-    if (!inputText.trim()) {
-      Alert.alert('提示', '請輸入讚美自己的內容喔！');
-      return;
+      const listDiv = document.getElementById('entriesList');
+      listDiv.innerHTML = '';
+      
+      data.forEach(item => {
+        const dateStr = new Date(item.created_at).toLocaleDateString('zh-TW');
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+        card.innerHTML = `
+          <div class="entry-date">${dateStr}</div>
+          <div class="entry-content">${escapeHtml(item.content)}</div>
+        `;
+        listDiv.appendChild(card);
+      });
     }
 
-    try {
+    async function addEntry() {
+      const input = document.getElementById('diaryInput');
+      const text = input.value.trim();
+      
+      if (!text) {
+        alert('請輸入讚美自己的內容喔！');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('praise_diaries')
-        .insert([{ content: inputText.trim() }])
-        .select();
+        .insert([{ content: text }]);
 
-      if (error) throw error;
-
-      if (data) {
-        setEntries([data[0], ...entries]);
-        setInputText('');
+      if (error) {
+        alert('儲存失敗：' + error.message);
+      } else {
+        input.value = '';
+        fetchEntries(); // 重新整理列表
       }
-    } catch (error: any) {
-      Alert.alert('錯誤', '儲存失敗：' + error.message);
     }
-  };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>✨ 我的讚美日記 ✨</Text>
-        <Text style={styles.subtitle}>每天肯定自己一點點，累積好心情！</Text>
-      </View>
-
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="今天有哪些值得自我讚美的事呢？"
-          value={inputText}
-          onChangeText={setInputText}
-          multiline
-        />
-        <TouchableOpacity style={styles.button} onPress={saveEntry}>
-          <Text style={styles.buttonText}>新增紀錄</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={entries}
-        keyExtractor={(item) => item.id}
-        refreshing={loading}
-        onRefresh={fetchEntries}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardDate}>
-              {new Date(item.created_at).toLocaleDateString('zh-TW')}
-            </Text>
-            <Text style={styles.cardContent}>{item.content}</Text>
-          </View>
-        )}
-        contentContainerStyle={styles.listContainer}
-      />
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F7F9FC' },
-  header: {
-    padding: 20,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E4E9F2',
-    alignItems: 'center',
-  },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#333333', marginBottom: 5 },
-  subtitle: { fontSize: 14, color: '#8F9BB3' },
-  inputContainer: {
-    padding: 15,
-    backgroundColor: '#FFF',
-    margin: 15,
-    borderRadius: 12,
-    elevation: 3,
-  },
-  input: {
-    minHeight: 80,
-    borderColor: '#E4E9F2',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: '#598BFF',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
-  listContainer: { paddingHorizontal: 15 },
-  card: {
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#598BFF',
-  },
-  cardDate: { fontSize: 12, color: '#8F9BB3', marginBottom: 5 },
-  cardContent: { fontSize: 16, color: '#222B45', lineHeight: 22 },
-});
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>
