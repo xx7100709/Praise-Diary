@@ -4,45 +4,141 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>讚美日記</title>
-  <!-- 載入 Supabase SDK 與 基礎樣式 -->
+  <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f7f9fc; color: #333; padding: 20px; max-width: 600px; margin: 0 auto; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f2f4f8;
+      color: #2c3e50;
+      padding: 20px 10px;
+      display: flex;
+      justify-content: center;
+    }
+    /* 筆記本外框造型 */
+    .notebook {
+      background: #ffffff;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border-left: 12px solid #598bff;
+      padding: 25px 20px;
+      position: relative;
+    }
     .header { text-align: center; margin-bottom: 20px; }
-    .header h1 { font-size: 24px; color: #333; margin-bottom: 5px; }
+    .header h1 { font-size: 24px; color: #333; margin-bottom: 6px; }
     .header p { font-size: 14px; color: #8f9bb3; }
-    .card { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    textarea { width: 100%; height: 80px; border: 1px solid #e4e9f2; border-radius: 8px; padding: 10px; font-size: 16px; margin-bottom: 10px; resize: none; }
-    button { width: 100%; background-color: #598bff; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    button:active { opacity: 0.8; }
-    .entry-card { background: #fff; border-left: 4px solid #598bff; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-    .entry-date { font-size: 12px; color: #8f9bb3; margin-bottom: 5px; }
-    .entry-content { font-size: 16px; color: #222b45; line-height: 1.4; white-space: pre-wrap; }
+    
+    /* 月曆區塊造型 */
+    .calendar-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .calendar-title {
+      font-weight: bold;
+      font-size: 16px;
+      color: #4a5568;
+      margin-bottom: 8px;
+    }
+    .calendar-date {
+      font-size: 28px;
+      font-weight: 800;
+      color: #598bff;
+    }
+
+    /* 輸入區域 */
+    .input-group { margin-bottom: 20px; }
+    textarea {
+      width: 100%;
+      height: 90px;
+      border: 1px solid #e4e9f2;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 16px;
+      resize: none;
+      outline: none;
+      transition: border 0.2s;
+    }
+    textarea:focus { border-color: #598bff; }
+    button {
+      width: 100%;
+      background-color: #598bff;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(89, 139, 255, 0.3);
+      transition: opacity 0.2s;
+    }
+    button:active { opacity: 0.85; }
+
+    /* 歷史卡片清單 */
+    .entry-card {
+      background: #ffffff;
+      border-left: 4px solid #598bff;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      border-top: 1px solid #f0f4f8;
+      border-right: 1px solid #f0f4f8;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .entry-date { font-size: 12px; color: #a0aec0; margin-bottom: 6px; font-weight: bold; }
+    .entry-content { font-size: 15px; color: #2d3748; line-height: 1.5; white-space: pre-wrap; }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>✨ 我的讚美日記 ✨</h1>
-    <p>每天肯定自己一點點，累積好心情！</p>
-  </div>
+  <div class="notebook">
+    <div class="header">
+      <h1>📖 我的讚美日記</h1>
+      <p>每天肯定自己一點點，累積好心情！</p>
+    </div>
 
-  <div class="card">
-    <textarea id="diaryInput" placeholder="今天有哪些值得自我讚美的事呢？"></textarea>
-    <button onclick="addEntry()">新增紀錄</button>
-  </div>
+    <!-- 月曆元件 -->
+    <div class="calendar-card">
+      <div class="calendar-title">今日日期</div>
+      <div class="calendar-date" id="todayDate">----/--/--</div>
+    </div>
 
-  <div id="entriesList"></div>
+    <!-- 輸入區塊 -->
+    <div class="input-group">
+      <textarea id="diaryInput" placeholder="今天有哪些值得自我讚美的事呢？"></textarea>
+      <button onclick="addEntry()">寫入讚美日記</button>
+    </div>
+
+    <!-- 日記紀錄 -->
+    <div id="entriesList"></div>
+  </div>
 
   <script>
-    // 請替換為你的 Supabase 設定
+    // 填入你的 Supabase 設定
     const SUPABASE_URL = 'https://kfhviyqgrfycmbhuotru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmaHZpeXFncmZ5Y21iaHVvdHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4NDUsImV4cCI6MjEwMzA1OTg0NX0.TCGksnMy7SCLmI8LxtwhhAnJaQ7vZhmid4M2poOxjBY';
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 頁面載入時讀取日記
-    window.onload = fetchEntries;
+    window.onload = function() {
+      // 顯示今天日期
+      const now = new Date();
+      document.getElementById('todayDate').innerText = now.toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        weekday: 'short'
+      });
+      fetchEntries();
+    };
 
     async function fetchEntries() {
       const { data, error } = await supabase
@@ -59,11 +155,17 @@
       listDiv.innerHTML = '';
       
       data.forEach(item => {
-        const dateStr = new Date(item.created_at).toLocaleDateString('zh-TW');
+        const dateStr = new Date(item.created_at).toLocaleString('zh-TW', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
         const card = document.createElement('div');
         card.className = 'entry-card';
         card.innerHTML = `
-          <div class="entry-date">${dateStr}</div>
+          <div class="entry-date">📅 ${dateStr}</div>
           <div class="entry-content">${escapeHtml(item.content)}</div>
         `;
         listDiv.appendChild(card);
@@ -87,7 +189,7 @@
         alert('儲存失敗：' + error.message);
       } else {
         input.value = '';
-        fetchEntries(); // 重新整理列表
+        fetchEntries();
       }
     }
 
