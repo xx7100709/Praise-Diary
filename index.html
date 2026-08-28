@@ -26,7 +26,7 @@
 
     .app-container {
       width: 100%;
-      max-width: 500px;
+      max-width: 480px;
       padding: 20px 20px 80px 20px;
     }
 
@@ -88,8 +88,8 @@
 
     /* 月曆內較小的 Icon */
     .cal-icon {
-      width: 13px;
-      height: 13px;
+      width: 12px;
+      height: 12px;
       stroke: #333333;
       stroke-width: 2.2;
       stroke-linecap: round;
@@ -121,7 +121,7 @@
     }
     .mood-btn * { pointer-events: none; }
     
-    /* 五種心情專屬顏色（愉快調校為偏冷更純正的粉紅 #FFC2D6） */
+    /* 五種心情專屬顏色 */
     .mood-btn[data-mood="愉快"].active { background: #FFC2D6; border-color: #111; }
     .mood-btn[data-mood="平靜"].active { background: #D0F0C0; border-color: #111; }
     .mood-btn[data-mood="充實"].active { background: #D0E8FF; border-color: #111; }
@@ -140,7 +140,7 @@
       resize: none;
       font-family: inherit;
       margin-bottom: 25px;
-      user-select: text; /* 允許輸入框選取文字 */
+      user-select: text;
     }
     textarea:focus { border-color: #111; }
 
@@ -168,6 +168,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      padding: 0 4px;
     }
     .cal-title { font-size: 22px; font-weight: 800; }
     .cal-nav {
@@ -177,23 +178,26 @@
       font-weight: bold;
     }
 
-    /* 星期幾標頭 */
+    /* 星期幾標頭：增加邊距防止對不齊與右側貼邊 */
     .week-header {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
+      gap: 6px;
       text-align: center;
       font-size: 13px;
       font-weight: 800;
       color: #8E8E93;
       margin-bottom: 10px;
+      padding: 0 2px;
     }
 
+    /* 月曆網格：精確對齊與邊界留白 */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 30px;
+      padding: 0 2px;
     }
     .cal-day-cell {
       aspect-ratio: 1;
@@ -203,8 +207,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 4px 4px 4px;
-      font-size: 14px;
+      padding: 5px 3px 3px 3px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       border: 1.5px solid transparent;
@@ -224,7 +228,7 @@
       display: flex;
       justify-content: flex-end;
       width: 100%;
-      height: 14px;
+      height: 12px;
     }
 
     /* --- 無框線風格讚美回顧卡片 --- */
@@ -233,9 +237,10 @@
       font-weight: 800;
       color: #8E8E93;
       margin-bottom: 15px;
+      padding: 0 4px;
     }
     .review-card-clean {
-      background: #F8F8FA; /* 無邊框，採用親和圓潤的輕灰底色 */
+      background: #F8F8FA; /* 極簡圓潤輕灰底色 */
       border-radius: 16px;
       padding: 16px 18px;
       margin-bottom: 12px;
@@ -246,21 +251,17 @@
     
     .review-top-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
     }
     .mood-dot-tag {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 800;
-      font-size: 14px;
-      color: #111;
+      gap: 8px;
     }
     .color-dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       display: inline-block;
     }
@@ -272,14 +273,6 @@
       white-space: pre-wrap;
       user-select: text;
     }
-    .delete-icon-btn {
-      color: #C7C7CC;
-      cursor: pointer;
-      padding: 2px 4px;
-      display: flex;
-      align-items: center;
-    }
-    .delete-icon-btn:hover { color: #FF3B30; }
 
     /* 底部導覽 TabBar */
     .tab-bar {
@@ -313,7 +306,7 @@
     .tab-item:not(.active) .line-icon { stroke: #8E8E93; }
     .tab-icon { margin-bottom: 4px; }
 
-    /* 無系統預設文字的專屬對話視窗 */
+    /* 自訂對話彈窗 */
     .custom-modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -333,14 +326,28 @@
     .custom-modal {
       background: #FFFFFF;
       border-radius: 20px;
-      padding: 24px;
+      padding: 24px 20px;
       width: 85%;
       max-width: 320px;
       text-align: center;
       box-shadow: 0 10px 25px rgba(0,0,0,0.12);
     }
-    .custom-modal-title { font-size: 17px; font-weight: 800; margin-bottom: 12px; }
-    .custom-modal-body { font-size: 15px; font-weight: 600; color: #444; margin-bottom: 20px; line-height: 1.4; }
+    .custom-modal-title { 
+      font-size: 17px; 
+      font-weight: 800; 
+      margin-bottom: 12px; 
+      display: block;
+    }
+    .custom-modal-title.hidden {
+      display: none; /* 當無標題時隱藏 */
+    }
+    .custom-modal-body { 
+      font-size: 15px; 
+      font-weight: 700; 
+      color: #111; 
+      margin-bottom: 20px; 
+      line-height: 1.4; 
+    }
     .modal-actions {
       display: flex;
       gap: 10px;
@@ -370,7 +377,7 @@
     <div id="pageHandbook" class="page active">
       <div class="header-bar">
         <div class="header-title">讚美手帳</div>
-        <!-- 支援補寫過去讚美的可選擇日期區域 -->
+        <!-- 支援補寫讚美的日期選擇 -->
         <div class="date-picker-wrapper">
           <input type="date" id="praiseDatePicker" class="date-picker-input">
           <span style="font-size: 12px; color: #666;">▾</span>
@@ -444,7 +451,7 @@
     </div>
   </div>
 
-  <!-- 自訂乾淨對話彈窗 (替代瀏覽器預設 alert/confirm) -->
+  <!-- 自訂對話彈窗 -->
   <div class="custom-modal-overlay" id="customModal">
     <div class="custom-modal">
       <div class="custom-modal-title" id="modalTitle">提示</div>
@@ -471,9 +478,9 @@
     let selectedDay = 29;
     let allEntries = [];
 
-    // 五種專屬心情顏色（愉快為偏冷較純正粉紅）
+    // 五種專屬心情顏色
     const moodColors = {
-      '愉快': '#FFC2D6', // 純正明亮粉紅
+      '愉快': '#FFC2D6', // 純正粉紅
       '平靜': '#D0F0C0', // 薄荷綠
       '充實': '#D0E8FF', // 淺藍
       '感恩': '#E8D0FF', // 淺紫
@@ -512,7 +519,6 @@
       currentMonth = now.getMonth();
       selectedDay = now.getDate();
 
-      // 設定手帳頁面的 DatePicker 預設日期
       const yyyy = currentYear;
       const mm = String(currentMonth + 1).padStart(2, '0');
       const dd = String(selectedDay).padStart(2, '0');
@@ -572,7 +578,6 @@
         return;
       }
 
-      // 依據選擇的日期建立 ISO Timestamp
       const chosenDate = new Date(dateVal + 'T12:00:00');
 
       const { error } = await supabaseClient
@@ -595,13 +600,12 @@
       }
     }
 
-    // 渲染對齊星期的情緒月曆
+    // 渲染正確留白的情緒月曆
     function renderCalendar() {
       document.getElementById('calMonthTitle').innerText = `${currentYear}年${currentMonth + 1}月`;
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = '';
 
-      // 計算月份第一天是星期幾
       const firstDay = new Date(currentYear, currentMonth, 1).getDay();
       const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
 
@@ -623,10 +627,8 @@
           return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === day;
         });
 
-        // 日期數字
         let cellHtml = `<div>${day}</div>`;
 
-        // 當天若有讚美，計算最多情緒、塗上代表色並放上精緻的小 Icon
         if (dayEntries.length > 0) {
           const moodCounts = {};
           dayEntries.forEach(e => {
@@ -669,7 +671,7 @@
       renderCalendar();
     }
 
-    // 渲染無框線讚美回顧卡片
+    // 渲染無框線、無文字標籤、無垃圾桶 Icon 的乾淨讚美回顧卡片
     function renderReviews() {
       document.getElementById('selectedDateLabel').innerText = `${currentMonth + 1}/${selectedDay} 讚美回顧`;
       const list = document.getElementById('reviewList');
@@ -681,7 +683,7 @@
       });
 
       if (dayEntries.length === 0) {
-        list.innerHTML = '<div style="color:#8E8E93; font-size:14px; padding: 10px 0;">這天還沒有寫下讚美喔～</div>';
+        list.innerHTML = '<div style="color:#8E8E93; font-size:14px; padding: 10px 4px;">這天還沒有寫下讚美喔～</div>';
         return;
       }
 
@@ -693,21 +695,18 @@
         const card = document.createElement('div');
         card.className = 'review-card-clean';
 
+        // 僅放 Color Dot 與 Icon，完全不出現情緒文字
         card.innerHTML = `
           <div class="review-top-row">
             <div class="mood-dot-tag">
               <span class="color-dot" style="background-color: ${color};"></span>
               ${iconSvg}
-              <span>${moodName}</span>
-            </div>
-            <div class="delete-icon-btn" onclick="askDeletePraise('${item.id}', event)">
-              <svg class="line-icon" style="width:16px; height:16px; stroke:#A0A0A0;" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             </div>
           </div>
           <div class="review-content-clean">${escapeHtml(item.content)}</div>
         `;
 
-        // 綁定長按刪除事件
+        // 長按 500ms 觸發刪除視窗
         let pressTimer = null;
         card.addEventListener('touchstart', (e) => {
           pressTimer = setTimeout(() => {
@@ -721,9 +720,8 @@
       });
     }
 
-    // 觸發自訂刪除確認彈窗 (僅顯示單純問句)
-    function askDeletePraise(id, event) {
-      if (event) event.stopPropagation();
+    // 觸發自訂刪除確認彈窗 (僅顯示乾淨問句)
+    function askDeletePraise(id) {
       showConfirmModal("確定刪除這篇讚美嗎？", () => {
         deletePraise(id);
       });
@@ -745,10 +743,13 @@
       }
     }
 
-    // 自訂純文字通知彈窗
+    // 普通通知彈窗
     let modalCallback = null;
     function showNoticeModal(title, msg, callback = null) {
-      document.getElementById('modalTitle').innerText = title;
+      const titleEl = document.getElementById('modalTitle');
+      titleEl.innerText = title;
+      titleEl.classList.remove('hidden');
+      
       document.getElementById('modalMessage').innerText = msg;
       
       const actions = document.getElementById('modalActions');
@@ -758,9 +759,11 @@
       modalCallback = callback;
     }
 
-    // 自訂刪除確認彈窗
+    // 刪除確認彈窗 (隱藏「提示」標題)
     function showConfirmModal(msg, onConfirm) {
-      document.getElementById('modalTitle').innerText = "提示";
+      const titleEl = document.getElementById('modalTitle');
+      titleEl.classList.add('hidden'); // 隱藏 "提示" 文字
+      
       document.getElementById('modalMessage').innerText = msg;
       
       const actions = document.getElementById('modalActions');
