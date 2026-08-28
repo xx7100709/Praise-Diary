@@ -3,247 +3,290 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>讚美日記</title>
+  <title>讚美手帳</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root {
-      --bg: #F4F4F0;
-      --card-bg: #FFFFFF;
-      --text: #111111;
-      --text-muted: #666666;
-      --border: #111111;
-      --accent-red: #FF3B30;
-      --accent-yellow: #FFCC00;
-      --accent-blue: #007AFF;
-      --accent-green: #34C759;
-    }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 0;
-      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #FFFFFF;
+      color: #111111;
+      padding-bottom: 70px; /* 留給底部 TabBar */
       display: flex;
       justify-content: center;
     }
 
-    /* 頂部 Swiss 風格繽紛 Color Bar */
-    .color-bar {
-      display: flex;
-      height: 8px;
+    .app-container {
       width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
-    }
-    .color-bar div { flex: 1; }
-    .bar-1 { background-color: var(--accent-red); }
-    .bar-2 { background-color: var(--accent-yellow); }
-    .bar-3 { background-color: var(--accent-blue); }
-    .bar-4 { background-color: var(--accent-green); }
-
-    .container {
-      width: 100%;
-      max-width: 600px;
-      padding: 40px 20px 20px 20px;
+      max-width: 500px;
+      padding: 20px 20px 80px 20px;
     }
 
-    /* Swiss Style 大膽黑體 Header */
-    .header {
-      border-bottom: 4px solid var(--border);
-      padding-bottom: 15px;
-      margin-bottom: 25px;
-    }
-    .header h1 {
-      font-size: 32px;
-      font-weight: 900;
-      letter-spacing: -1px;
-      text-transform: uppercase;
-    }
-    .header p {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-top: 5px;
-      font-weight: 600;
-    }
-
-    /* 瑞士月曆區塊 (Calendar Bar) */
-    .swiss-calendar {
-      background: var(--card-bg);
-      border: 3px solid var(--border);
-      padding: 15px;
-      margin-bottom: 25px;
+    /* 頂部標題與日期 */
+    .header-bar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      box-shadow: 4px 4px 0px var(--border);
+      align-items: center;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #111;
+      margin-bottom: 25px;
     }
-    .cal-left {
-      display: flex;
-      flex-direction: column;
+    .header-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+    .date-badge {
+      background: #F4F4F0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
     }
-    .cal-month {
+
+    /* 區塊小標 */
+    .section-label {
       font-size: 12px;
       font-weight: 800;
+      color: #8E8E93;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
       text-transform: uppercase;
-      color: var(--accent-red);
-      letter-spacing: 1px;
-    }
-    .cal-day {
-      font-size: 36px;
-      font-weight: 900;
-      line-height: 1;
-    }
-    .cal-right {
-      text-align: right;
-    }
-    .cal-weekday {
-      font-size: 18px;
-      font-weight: 800;
-      background: var(--text);
-      color: var(--bg);
-      padding: 4px 8px;
-      display: inline-block;
     }
 
-    /* 輸入卡片區塊 */
-    .input-card {
-      background: var(--card-bg);
-      border: 3px solid var(--border);
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 4px 4px 0px var(--border);
+    /* 心情選擇區塊 */
+    .mood-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 25px;
     }
+    .mood-btn {
+      background: #F4F4F0;
+      border: 1.5px solid transparent;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .mood-btn.active {
+      background: #FFD0D0;
+      border-color: #111;
+    }
+
+    /* 文字輸入框 */
     textarea {
       width: 100%;
-      height: 90px;
-      border: 2px solid var(--border);
-      padding: 12px;
+      height: 180px;
+      border: 1.5px solid #E5E5EA;
+      border-radius: 16px;
+      padding: 16px;
       font-size: 16px;
-      font-weight: 500;
       outline: none;
       resize: none;
       font-family: inherit;
+      margin-bottom: 25px;
     }
-    textarea:focus {
-      background-color: #FAF9F5;
-    }
-    button {
+    textarea:focus { border-color: #111; }
+
+    /* 黑色主要按鈕 */
+    .btn-submit {
       width: 100%;
-      background: var(--text);
-      color: var(--bg);
+      background: #111111;
+      color: #FFFFFF;
       border: none;
-      padding: 14px;
+      padding: 16px;
+      border-radius: 14px;
       font-size: 16px;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
       cursor: pointer;
-      margin-top: 12px;
-      transition: all 0.1s ease;
     }
-    button:hover {
-      background: var(--accent-blue);
-      color: #FFF;
-    }
-    button:active {
-      transform: translate(2px, 2px);
-    }
+    .btn-submit:active { opacity: 0.85; }
 
-    /* 歷史條目區塊 */
-    .entry-card {
-      background: var(--card-bg);
-      border: 3px solid var(--border);
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 4px 4px 0px var(--border);
+    /* 頁面分頁控制 */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* --- 月曆頁面樣式 --- */
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .cal-title { font-size: 22px; font-weight: 800; }
+    .cal-nav { font-size: 20px; cursor: pointer; padding: 0 10px; font-weight: bold; }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .cal-day-cell {
+      aspect-ratio: 1;
+      background: #F8F8FA;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid transparent;
       position: relative;
     }
-    .entry-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 6px;
-      background-color: var(--accent-blue);
+    .cal-day-cell.active {
+      background: #FFD0D0;
+      border-color: #111;
     }
-    .entry-date {
-      font-size: 12px;
+    .cal-day-cell .mood-icon { font-size: 10px; margin-top: 2px; }
+
+    /* 月曆下的日記記錄列表 */
+    .review-title {
+      font-size: 14px;
       font-weight: 800;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
+      color: #8E8E93;
+      margin-bottom: 15px;
     }
-    .entry-content {
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 1.5;
-      white-space: pre-wrap;
+    .review-card {
+      background: #FFFFFF;
+      border: 1.5px solid #E5E5EA;
+      border-left: 5px solid #FFD0D0;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
     }
+    .review-mood { font-size: 18px; margin-bottom: 6px; }
+    .review-content { font-size: 15px; font-weight: 700; color: #111; line-height: 1.4; }
+
+    /* 底部導覽 TabBar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: #FFFFFF;
+      border-top: 1px solid #E5E5EA;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #8E8E93;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .tab-item.active { color: #111111; }
+    .tab-icon { font-size: 20px; margin-bottom: 3px; }
   </style>
 </head>
 <body>
 
-  <!-- 頂部多色 Color Bar -->
-  <div class="color-bar">
-    <div class="bar-1"></div>
-    <div class="bar-2"></div>
-    <div class="bar-3"></div>
-    <div class="bar-4"></div>
+  <div class="app-container">
+    
+    <!-- 頁面 1: 讚美手帳 (填寫頁) -->
+    <div id="pageHandbook" class="page active">
+      <div class="header-bar">
+        <div class="header-title">讚美手帳</div>
+        <div class="date-badge" id="currentTodayDate">2026/08/24 ▾</div>
+      </div>
+
+      <div class="section-label">SELECT MOOD</div>
+      <div class="mood-grid">
+        <button class="mood-btn active" onclick="selectMood(this, '😊 愉快')"><span>😊</span> 愉快</button>
+        <button class="mood-btn" onclick="selectMood(this, '😌 平靜')"><span>😌</span> 平靜</button>
+        <button class="mood-btn" onclick="selectMood(this, '⚡ 充實')"><span>⚡</span> 充實</button>
+        <button class="mood-btn" onclick="selectMood(this, '🤍 感恩')"><span>🤍</span> 感恩</button>
+        <button class="mood-btn" onclick="selectMood(this, '⭐ 自信')"><span>⭐</span> 自信</button>
+      </div>
+
+      <div class="section-label">YOUR PRAISE</div>
+      <textarea id="praiseInput" placeholder="寫下今天對自己的讚美..."></textarea>
+
+      <button class="btn-submit" onclick="submitPraise()">儲存讚美</button>
+    </div>
+
+    <!-- 頁面 2: 情緒月曆 (日曆與點閱頁) -->
+    <div id="pageCalendar" class="page">
+      <div class="cal-header">
+        <div class="cal-nav" onclick="changeMonth(-1)">&lt;</div>
+        <div class="cal-title" id="calMonthTitle">2026年8月</div>
+        <div class="cal-nav" onclick="changeMonth(1)">&gt;</div>
+      </div>
+
+      <div class="calendar-grid" id="calendarGrid"></div>
+
+      <div class="review-title" id="selectedDateLabel">8/24 讚美回顧</div>
+      <div id="reviewList"></div>
+    </div>
+
   </div>
 
-  <div class="container">
-    <div class="header">
-      <h1>PRAISE DIARY.</h1>
-      <p>每天肯定自己一點點／累積好心情</p>
+  <!-- 底部選單 Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab-item active" id="tab1" onclick="switchTab('handbook')">
+      <div class="tab-icon">✏️</div>
+      <div>讚美手帳</div>
     </div>
-
-    <!-- 瑞士風格月曆 Bar -->
-    <div class="swiss-calendar">
-      <div class="cal-left">
-        <span class="cal-month" id="calMonth">JANUARY</span>
-        <span class="cal-day" id="calDay">01</span>
-      </div>
-      <div class="cal-right">
-        <span class="cal-weekday" id="calWeekday">MON</span>
-      </div>
+    <div class="tab-item" id="tab2" onclick="switchTab('calendar')">
+      <div class="tab-icon">📅</div>
+      <div>情緒月曆</div>
     </div>
-
-    <!-- 日記輸入卡片 -->
-    <div class="input-card">
-      <textarea id="diaryInput" placeholder="今天有哪些值得自我讚美的事呢？"></textarea>
-      <button onclick="addEntry()">寫入讚美日記</button>
-    </div>
-
-    <!-- 歷史日記列表 -->
-    <div id="entriesList"></div>
   </div>
 
   <script>
     // 填入你的 Supabase 設定
-    const SUPABASE_URL = 'https://kfhviyqgrfycmbhuotru.supabase.co';
+    const SUPABASE_URL = 'https://kfhviyqgrfycmbhuotru.supabase.co/rest/v1/';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmaHZpeXFncmZ5Y21iaHVvdHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4NDUsImV4cCI6MjEwMzA1OTg0NX0.TCGksnMy7SCLmI8LxtwhhAnJaQ7vZhmid4M2poOxjBY';
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    let selectedMoodText = '😊 愉快';
+    let currentYear = 2026;
+    let currentMonth = 7; // 0-indexed (7 表示 8月)
+    let selectedDay = 24;
+    let allEntries = [];
+
     window.onload = function() {
-      updateSwissCalendar();
+      const now = new Date();
+      currentYear = now.getFullYear();
+      currentMonth = now.getMonth();
+      selectedDay = now.getDate();
+
+      const dateStr = `${currentYear}/${String(currentMonth + 1).padStart(2, '0')}/${String(selectedDay).padStart(2, '0')}`;
+      document.getElementById('currentTodayDate').innerText = dateStr + ' ▾';
+      
       fetchEntries();
     };
 
-    function updateSwissCalendar() {
-      const now = new Date();
-      const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-      const weekdays = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    function selectMood(btn, mood) {
+      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMoodText = mood;
+    }
 
-      document.getElementById('calMonth').innerText = months[now.getMonth()];
-      document.getElementById('calDay').innerText = String(now.getDate()).padStart(2, '0');
-      document.getElementById('calWeekday').innerText = weekdays[now.getDay()];
+    function switchTab(tabName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
+      if (tabName === 'handbook') {
+        document.getElementById('pageHandbook').classList.add('active');
+        document.getElementById('tab1').classList.add('active');
+      } else {
+        document.getElementById('pageCalendar').classList.add('active');
+        document.getElementById('tab2').classList.add('active');
+        renderCalendar();
+      }
     }
 
     async function fetchEntries() {
@@ -252,47 +295,98 @@
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('讀取失敗:', error);
-        return;
+      if (!error && data) {
+        allEntries = data;
+        renderCalendar();
       }
-
-      const listDiv = document.getElementById('entriesList');
-      listDiv.innerHTML = '';
-      
-      data.forEach(item => {
-        const dateObj = new Date(item.created_at);
-        const dateStr = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${String(dateObj.getDate()).padStart(2, '0')} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
-        
-        const card = document.createElement('div');
-        card.className = 'entry-card';
-        card.innerHTML = `
-          <div class="entry-date">${dateStr}</div>
-          <div class="entry-content">${escapeHtml(item.content)}</div>
-        `;
-        listDiv.appendChild(card);
-      });
     }
 
-    async function addEntry() {
-      const input = document.getElementById('diaryInput');
-      const text = input.value.trim();
-      
+    async function submitPraise() {
+      const text = document.getElementById('praiseInput').value.trim();
       if (!text) {
-        alert('請輸入讚美自己的內容喔！');
+        alert('寫下今天對自己的讚美吧！');
         return;
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('praise_diaries')
-        .insert([{ content: text }]);
+        .insert([{ content: text, mood: selectedMoodText }]);
 
       if (error) {
         alert('儲存失敗：' + error.message);
       } else {
-        input.value = '';
-        fetchEntries();
+        document.getElementById('praiseInput').value = '';
+        alert('儲存成功！');
+        await fetchEntries();
+        switchTab('calendar');
       }
+    }
+
+    function renderCalendar() {
+      document.getElementById('calMonthTitle').innerText = `${currentYear}年${currentMonth + 1}月`;
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell' + (day === selectedDay ? ' active' : '');
+        cell.onclick = () => selectCalDay(day);
+
+        // 搜尋該日是否有紀錄
+        const hasEntry = allEntries.find(e => {
+          const d = new Date(e.created_at);
+          return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === day;
+        });
+
+        cell.innerHTML = `<div>${day}</div>`;
+        if (hasEntry && hasEntry.mood) {
+          cell.innerHTML += `<div class="mood-icon">${hasEntry.mood.split(' ')[0]}</div>`;
+        }
+
+        grid.appendChild(cell);
+      }
+
+      renderReviews();
+    }
+
+    function selectCalDay(day) {
+      selectedDay = day;
+      renderCalendar();
+    }
+
+    function changeMonth(delta) {
+      currentMonth += delta;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      renderCalendar();
+    }
+
+    function renderReviews() {
+      document.getElementById('selectedDateLabel').innerText = `${currentMonth + 1}/${selectedDay} 讚美回顧`;
+      const list = document.getElementById('reviewList');
+      list.innerHTML = '';
+
+      const dayEntries = allEntries.filter(e => {
+        const d = new Date(e.created_at);
+        return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === selectedDay;
+      });
+
+      if (dayEntries.length === 0) {
+        list.innerHTML = '<div style="color:#8E8E93; font-size:14px;">這天還沒有寫下讚美喔～</div>';
+        return;
+      }
+
+      dayEntries.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'review-card';
+        card.innerHTML = `
+          <div class="review-mood">${item.mood || '😊'}</div>
+          <div class="review-content">${escapeHtml(item.content)}</div>
+        `;
+        list.appendChild(card);
+      });
     }
 
     function escapeHtml(text) {
