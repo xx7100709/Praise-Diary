@@ -1,0 +1,158 @@
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+  SafeAreaView,
+} from 'react-native';
+import { createClient } from '@supabase/supabase-js';
+
+// 請在引號內填入你的 Supabase URL 與 ANON KEY
+const SUPABASE_URL = 'https://kfhviyqgrfycmbhuotru.supabase.co/rest/v1/';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmaHZpeXFncmZ5Y21iaHVvdHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0ODM4NDUsImV4cCI6MjEwMzA1OTg0NX0.TCGksnMy7SCLmI8LxtwhhAnJaQ7vZhmid4M2poOxjBY';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+interface DiaryEntry {
+  id: string;
+  content: string;
+  created_at: string;
+}
+
+export default function HomeScreen() {
+  const [entries, setEntries] = useState<DiaryEntry[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchEntries();
+  }, []);
+
+  const fetchEntries = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('praise_diaries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      if (data) setEntries(data);
+    } catch (error: any) {
+      console.log('Error fetching:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveEntry = async () => {
+    if (!inputText.trim()) {
+      Alert.alert('提示', '請輸入讚美自己的內容喔！');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('praise_diaries')
+        .insert([{ content: inputText.trim() }])
+        .select();
+
+      if (error) throw error;
+
+      if (data) {
+        setEntries([data[0], ...entries]);
+        setInputText('');
+      }
+    } catch (error: any) {
+      Alert.alert('錯誤', '儲存失敗：' + error.message);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>✨ 我的讚美日記 ✨</Text>
+        <Text style={styles.subtitle}>每天肯定自己一點點，累積好心情！</Text>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="今天有哪些值得自我讚美的事呢？"
+          value={inputText}
+          onChangeText={setInputText}
+          multiline
+        />
+        <TouchableOpacity style={styles.button} onPress={saveEntry}>
+          <Text style={styles.buttonText}>新增紀錄</Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={entries}
+        keyExtractor={(item) => item.id}
+        refreshing={loading}
+        onRefresh={fetchEntries}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Text style={styles.cardDate}>
+              {new Date(item.created_at).toLocaleDateString('zh-TW')}
+            </Text>
+            <Text style={styles.cardContent}>{item.content}</Text>
+          </View>
+        )}
+        contentContainerStyle={styles.listContainer}
+      />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#F7F9FC' },
+  header: {
+    padding: 20,
+    backgroundColor: '#FFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E4E9F2',
+    alignItems: 'center',
+  },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#333333', marginBottom: 5 },
+  subtitle: { fontSize: 14, color: '#8F9BB3' },
+  inputContainer: {
+    padding: 15,
+    backgroundColor: '#FFF',
+    margin: 15,
+    borderRadius: 12,
+    elevation: 3,
+  },
+  input: {
+    minHeight: 80,
+    borderColor: '#E4E9F2',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: '#598BFF',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
+  listContainer: { paddingHorizontal: 15 },
+  card: {
+    backgroundColor: '#FFF',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#598BFF',
+  },
+  cardDate: { fontSize: 12, color: '#8F9BB3', marginBottom: 5 },
+  cardContent: { fontSize: 16, color: '#222B45', lineHeight: 22 },
+});
