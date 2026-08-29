@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>讚美手帳</title>
+  
+  <!-- ==================== App Icon 連結區塊 ==================== -->
+  <!-- Android Chrome 主畫面捷徑 Icon (建議 192x192 px 以上) -->
+  <link rel="icon" sizes="192x192" href="https://i.meee.com.tw/6Uquu7X.png">
+  <link rel="icon" sizes="512x512" href="https://i.meee.com.tw/6Uquu7X.png">
+
   <link rel="manifest" href="manifest.json">
   
   <!-- 載入外部 Key 檔與 Supabase SDK -->
@@ -45,7 +51,6 @@
     }
     .header-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
     
-    /* 縮短日期選擇器寬度與內襯 */
     .date-picker-wrapper {
       position: relative;
       background: #F0F0EE;
@@ -101,7 +106,7 @@
       fill: none;
     }
 
-    /* 心情選擇按鈕：邊框加粗為 2px，與月曆一致 */
+    /* 心情選擇按鈕 */
     .mood-grid {
       display: flex;
       flex-wrap: wrap;
@@ -231,7 +236,7 @@
       height: 12px;
     }
 
-    /* --- 重構：手帳風格讚美回顧卡片 --- */
+    /* 手帳風格讚美回顧卡片 */
     .review-title {
       font-size: 12px;
       font-weight: 800;
@@ -247,7 +252,7 @@
       padding: 18px;
       margin-bottom: 14px;
       border: 1.5px solid #111111;
-      box-shadow: 3px 3px 0px #111111; /* 經典手帳俐落陰影 */
+      box-shadow: 3px 3px 0px #111111;
       transition: transform 0.1s ease;
     }
     .review-card-journal:active { 
@@ -261,7 +266,6 @@
       margin-bottom: 12px;
     }
 
-    /* 心情顏色膠囊 Badge (只放 Icon，不放文字) */
     .mood-pill {
       display: inline-flex;
       align-items: center;
@@ -653,7 +657,6 @@
       renderCalendar();
     }
 
-    // 讚美回顧卡片渲染（膠囊 Badge + 質感陰影風格）
     function renderReviews() {
       document.getElementById('selectedDateLabel').innerText = `${currentMonth + 1}/${selectedDay} 讚美回顧`;
       const list = document.getElementById('reviewList');
@@ -686,7 +689,6 @@
           <div class="card-content-journal">${escapeHtml(item.content)}</div>
         `;
 
-        // 長按 500ms 觸發刪除
         let pressTimer = null;
         card.addEventListener('touchstart', () => {
           pressTimer = setTimeout(() => {
